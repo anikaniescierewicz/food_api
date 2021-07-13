@@ -12,5 +12,5 @@ sls deploy -s dev
 ## Data loader
 use data loader function
 ```
-python food_api/data_loader.py
+python -m food_api.data_loader
 ```

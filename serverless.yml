@@ -29,24 +29,19 @@ provider:
   
 
 # you can add statements to the Lambda function's IAM Role here
-#  iamRoleStatements:
-#    - Effect: "Allow"
-#      Action:
-#        - "s3:ListBucket"
-#      Resource: { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "ServerlessDeploymentBucket" } ] ]  }
-#    - Effect: "Allow"
-#      Action:
-#        - "s3:PutObject"
-#      Resource:
-#        Fn::Join:
-#          - ""
-#          - - "arn:aws:s3:::"
-#            - "Ref" : "ServerlessDeploymentBucket"
-#            - "/*"
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "dynamodb:GetItem"
+      Resource: 
+        Fn::GetAtt:
+          - foodDBTable
+          - Arn
+
 
 # you can define service wide environment variables here
-#  environment:
-#    variable1: value1
+  environment:
+    STAGE: "${opt:stage}"
 
 # you can add packaging information here
 #package:
@@ -60,6 +55,8 @@ provider:
 functions:
   hello:
     handler: food_api/handler.hello
+  categories:
+    handler: food_api/handler.get_categories
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details
@@ -101,13 +98,26 @@ functions:
 #      variable2: value2
 
 # you can add CloudFormation resource templates here
-#resources:
-#  Resources:
-#    NewResource:
-#      Type: AWS::S3::Bucket
-#      Properties:
-#        BucketName: my-new-bucket
-#  Outputs:
-#     NewOutput:
-#       Description: "Description for the output"
-#       Value: "Some output value"
+resources:
+  Resources:
+    foodDBTable: 
+      Type: AWS::DynamoDB::Table
+      Properties: 
+        AttributeDefinitions: 
+          - 
+            AttributeName: "PK"
+            AttributeType: "S"
+          - 
+            AttributeName: "SK"
+            AttributeType: "S"
+        KeySchema: 
+          - 
+            AttributeName: "PK"
+            KeyType: "HASH"
+          - 
+            AttributeName: "SK"
+            KeyType: "RANGE"
+        ProvisionedThroughput: 
+          ReadCapacityUnits: "3"
+          WriteCapacityUnits: "1"
+        TableName: "${opt:stage}-food"
