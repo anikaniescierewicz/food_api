@@ -44,13 +44,11 @@ provider:
     STAGE: "${opt:stage}"
 
 # you can add packaging information here
-#package:
-#  include:
-#    - include-me.py
-#    - include-me-dir/**
-#  exclude:
-#    - exclude-me.py
-#    - exclude-me-dir/**
+package:
+  exclude:
+    - ./**
+  include:
+   - food_api/**
 
 functions:
   hello:

@@ -1,8 +1,14 @@
+"""
+Lambda handler functions
+"""
 import json
 from os import environ
-from food_api.utils import get_hostname, get_ddb_table 
+from food_api.utils import get_hostname, get_ddb_table
 
 def hello(event, _context):
+    """
+    Hello function from serverless example
+    """
     body = {
         "message": "Go Serverless v1.0! Your function executed successfully!",
         "input": event,
@@ -18,14 +24,11 @@ def hello(event, _context):
 
     # Use this code if you don't use the http event with the LAMBDA-PROXY
     # integration
-    """
-    return {
-        "message": "Go Serverless v1.0! Your function executed successfully!",
-        "event": event
-    }
-    """
 
-def get_categories(_event, _context):
+def get_categories(_event: dict, _context: dict) -> list:
+    """
+    Query DynamoDB and return list of categories
+    """
     table_name = f"{environ['STAGE']}-food"
     table = get_ddb_table(table_name)
     categories = table.get_item(Key={'PK': 'CATEGORIES', 'SK': 'CATEGORIES'})
