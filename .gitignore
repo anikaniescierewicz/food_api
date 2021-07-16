@@ -18,6 +18,7 @@ var/
 __pycache__/
 *.py[cod]
 .DS_Store
+node_modules/
 
 # Serverless directories
 .serverless

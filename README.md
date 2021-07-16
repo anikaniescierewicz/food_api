@@ -8,6 +8,14 @@ Deploy to the dev environment:
 ```
 sls deploy -s dev
 ```
+### Create ACM Certificate
+```
+serverless create-cert -s dev
+```
+### Create domain
+```
+serverless create_domain -s dev
+```
 
 ## Data loader
 use data loader function

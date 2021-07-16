@@ -24,6 +24,8 @@ provider:
   name: aws
   runtime: python3.8
   region: us-west-1
+  apiKeys:
+    - myFoodKey
 # you can overwrite defaults here
 #  stage: dev
   
@@ -33,6 +35,7 @@ provider:
     - Effect: "Allow"
       Action:
         - "dynamodb:GetItem"
+        - "dynamodb:Query"
       Resource: 
         Fn::GetAtt:
           - foodDBTable
@@ -55,13 +58,34 @@ functions:
     handler: food_api/handler.hello
   categories:
     handler: food_api/handler.get_categories
-#    The following are a few example events you can configure
-#    NOTE: Please make sure to change your handler code to work with those events
-#    Check the event documentation for details
-#    events:
-#      - http:
-#          path: users/create
-#          method: get
+    events:
+      - http:
+          path: categories
+          method: get
+          private: true
+  get_food_category:
+    handler: food_api/handler.get_food_category
+    events:
+      - http:
+          path: category/{category}
+          method: get
+          private: true
+          request:
+            parameters:
+              paths:
+                category: true
+  get_single_food:
+    handler: food_api/handler.get_single_food
+    events:
+      - http:
+          path: food/{category}/{food_id}
+          method: get
+          private: true
+          request:
+            parameters:
+              paths:
+                category: true
+                food_id: true
 #      - websocket: $connect
 #      - s3: ${env:BUCKET}
 #      - schedule: rate(10 minutes)
@@ -94,7 +118,22 @@ functions:
 #    Define function environment variables here
 #    environment:
 #      variable2: value2
+plugins:
+  - serverless-certificate-creator
+  - serverless-domain-manager
 
+custom:
+  customCertificate:
+    certificateName: ${file(${opt:stage}.yml):domain_name}
+    hostedZoneNames: 'anikamlodzianowski.com.'
+    region: us-west-1
+  customDomain:
+    domainName: ${file(${opt:stage}.yml):domain_name}
+    certificateName: ${file(${opt:stage}.yml):domain_name}
+    basePath: ''
+    stage: ${self:provider.stage}
+    createRoute53Record: true
+    endpointType: regional
 # you can add CloudFormation resource templates here
 resources:
   Resources:
