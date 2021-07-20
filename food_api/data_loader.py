@@ -9,7 +9,7 @@ from food_api.utils import get_ddb_table
 
 # csv file name
 FILENAME = "data/food.csv"
-TABLE_NAME = 'dev-food'
+TABLE_NAME = 'prod-food'
 
 def load_data_from_csv() -> tuple:
     """

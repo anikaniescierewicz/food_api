@@ -25,7 +25,7 @@ provider:
   runtime: python3.8
   region: us-west-1
   apiKeys:
-    - myFoodKey
+    - "${opt:stage}-myFoodKey"
 # you can overwrite defaults here
 #  stage: dev
   
@@ -54,8 +54,6 @@ package:
    - food_api/**
 
 functions:
-  hello:
-    handler: food_api/handler.hello
   categories:
     handler: food_api/handler.get_categories
     events:
@@ -121,6 +119,7 @@ functions:
 plugins:
   - serverless-certificate-creator
   - serverless-domain-manager
+  - serverless-plugin-aws-alerts
 
 custom:
   customCertificate:
@@ -131,9 +130,19 @@ custom:
     domainName: ${file(${opt:stage}.yml):domain_name}
     certificateName: ${file(${opt:stage}.yml):domain_name}
     basePath: ''
-    stage: ${self:provider.stage}
+    stage: ${opt:stage}
     createRoute53Record: true
     endpointType: regional
+  alerts:
+    stages:
+      - prod 
+      # - dev
+    topics:
+      alarm:
+        topic: "${opt:stage}-alarm-topic"
+    alarms:
+      - functionErrors
+      # - functionThrottles
 # you can add CloudFormation resource templates here
 resources:
   Resources:
